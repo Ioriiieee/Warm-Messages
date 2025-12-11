@@ -16,13 +16,55 @@ const msg = document.getElementById("message");
 const musicBtn = document.getElementById("musicBtn");
 const bgMusic = document.getElementById("bgMusic");
 
+// Timeout handle so repeated clicks clear previous hide timer
+let messageTimeout = null;
+// Cooldown to prevent message spamming (milliseconds)
+const MESSAGE_COOLDOWN = 2000; // 2 seconds
+let isCooldown = false;
+
 // random message + sparkles
 heart.addEventListener("click", (e) => {
     const random = Math.floor(Math.random() * messages.length);
-    msg.textContent = messages[random];
-    msg.classList.add("show");
+    const chosen = messages[random];
 
-    setTimeout(() => msg.classList.remove("show"), 2000);
+    // If cooldown active, ignore the click
+    if (isCooldown) {
+        return;
+    }
+
+    // Activate cooldown
+    isCooldown = true;
+    setTimeout(() => { isCooldown = false; }, MESSAGE_COOLDOWN);
+
+    // Clear previous hide timer so rapid clicks behave correctly
+    if (messageTimeout) {
+        clearTimeout(messageTimeout);
+        messageTimeout = null;
+    }
+
+    if (msg) {
+        // Immediately update text and show
+        msg.textContent = chosen;
+        // remove then re-add class to restart any CSS transition if necessary
+        msg.classList.remove("show");
+        // small forced reflow to ensure class re-add is recognized
+        // eslint-disable-next-line no-unused-expressions
+        msg.offsetHeight;
+        msg.classList.add("show");
+
+        // Fallback inline styles to force visibility if CSS is overridden
+        msg.style.transition = msg.style.transition || 'opacity 0.45s ease';
+        msg.style.opacity = '1';
+    }
+
+    // Shorter display time so messages disappear quicker (spam-friendly)
+    messageTimeout = setTimeout(() => {
+        if (msg) {
+            msg.classList.remove("show");
+            msg.style.opacity = '0';
+        }
+        messageTimeout = null;
+    }, 800); // 800ms display
 
     createSparkles(e.pageX, e.pageY);
 });
@@ -46,14 +88,46 @@ function createSparkles(x, y) {
 
 // MUSIC TOGGLE (ICON ONLY)
 let playing = false;
+// Accessibility attributes
+if (musicBtn) {
+    musicBtn.setAttribute('aria-label', 'Toggle background music');
+    musicBtn.setAttribute('aria-pressed', 'false');
+}
+
+// Log audio load errors
+if (bgMusic) {
+    bgMusic.addEventListener('error', (e) => {
+        console.warn('bgMusic failed to load:', e);
+    });
+}
+
 musicBtn.addEventListener("click", () => {
+    if (!bgMusic) {
+        console.warn('bgMusic element not found');
+        return;
+    }
+
     if (!playing) {
-        bgMusic.play();
-        musicBtn.textContent = "🔇";
-        playing = true;
+        const playPromise = bgMusic.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                musicBtn.textContent = "🔇";
+                musicBtn.setAttribute('aria-pressed', 'true');
+                playing = true;
+            }).catch((err) => {
+                console.warn('Audio play prevented:', err);
+                // Optionally show a user-visible hint here
+            });
+        } else {
+            // Older browsers may not return a promise
+            musicBtn.textContent = "🔇";
+            musicBtn.setAttribute('aria-pressed', 'true');
+            playing = true;
+        }
     } else {
         bgMusic.pause();
         musicBtn.textContent = "🎵";
+        musicBtn.setAttribute('aria-pressed', 'false');
         playing = false;
     }
 });
