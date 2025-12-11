@@ -1,0 +1,19 @@
+script.js — verified and forced the DOM update
+
+Added debug logs:
+console.log('DEBUG: heart element ->', heart);
+console.log('DEBUG: message element ->', msg);
+console.log('DEBUG: clicked heart, index=', random, 'message=', chosen);
+These confirmed the click handler ran and which message was chosen.
+Safeguard for #message existence: checked if (msg) { ... } else { console.warn(...) }.
+Added a small inline-style fallback for debugging:
+msg.style.transition = 'opacity 0.6s ease' (if not set) and msg.style.opacity = '1' immediately after adding .show.
+After 2s we remove the class and set msg.style.opacity = '0'.
+Rationale: if some CSS rule was still preventing the .show opacity change, setting inline opacity forces the element visible while we debug.
+Why that fixed it
+
+The message element was correctly updated by JS but remained visually hidden because of CSS issues (missing color, duplicated/overridden rules, or stacking order). The combination of explicit color, removing duplicates, setting z-index, and the inline opacity fallback ensured the DOM text change became visible.
+What I can do next (recommended)
+
+Remove the debug console.log lines and the inline-style fallback (clean production code). I can patch that quickly.
+Commit & push the final cleaned changes for you.
