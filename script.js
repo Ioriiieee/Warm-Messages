@@ -2,14 +2,100 @@ const messages = [
     "I hope today is soft for you. ❤️",
     "You're doing amazing, even if you don't feel it.",
     "Proud ako sa’yo always.",
-    "Please drink water, love.",
+    "Please drink water and take breaks. You deserve it.",
     "Your smile makes things lighter.",
     "You're a blessing more than you know.",
-    "You're worth loving, always.",
     "I appreciate you. Kindly and deeply.",
     "Ang ganda mo kahit stressed ka. Promise.",
-    "You're stronger than you think."
+    "You're stronger than you think.",
+    "Study well and Goodluck diyan! You got this!",
+    "Sending you positive vibes and virtual hugs! 🤗",
+    "Remember to take deep breaths and relax. You deserve peace.",
+    "You are loved more than you know. ❤️",
+    "Keep shining, even on the tough days. Your light is beautiful.",
+    "Take a moment to appreciate how far you've come. You're doing great!",
+    "Believe in yourself; you have the strength to overcome any challenge.",
+    "Your kindness and compassion make the world a better place.",
+    "Don't forget to smile today! Your smile is contagious.",
+    "You are capable of amazing things. Keep pushing forward!",
+    "Take care of yourself, both mind and body. You deserve it.",
+    "Wishing you a day filled with joy and positivity! 🌟",
+    "Remember, it's okay to ask for help when you need it. You're not alone.",
+    "You have a unique and beautiful soul. Embrace it!",
+    "I miss you na! Can't wait to see you again soon. 💕",
+    "Sending you all my love and warm hugs! 🤗❤️",
+    "Thinking of you always and hoping you're doing well. 🌸",
+    "You are my sunshine on a cloudy day. ☀️🌧️",
+    "I hope you have a wonderful day filled with happiness and laughter! 😊",
+    "Just wanted to remind you how special you are to me. 💖",
+    "Take care of yourself, my dear. You deserve all the love and care in the world. 🌷",
+    "i love you",
+    "You are the most amazing person I know. ❤️",   
+    "Goodluck future RN! You've got this!",
+    "Believe in yourself as much as I believe in you. 🌟",
+    "Alam kong pagod ka today, pero proud ako sa’yo sobra.",
+    "You’re doing great, kahit feeling mo hindi.",
+    "One day at a time lang, okay? You got this.",
+    "Nakikita ko yung effort mo, kahit di mo napapansin.",
+    "Okay lang mapagod. Hindi ibig sabihin mahina ka.",
+    "Future RN ka for a reason.",
+    "Kahit slow days, progress pa rin ’yan.",
+    "Naniniwala ako sa’yo, kahit ikaw minsan nagdududa.",
+    "You don’t have to have it all figured out today.",
+    "Proud ako sa kung paano mo hinahandle lahat.",
+    "Ang tapang mo, kahit tahimik ka lang lumalaban.",
+    "Rest when you need to. Deserve mo ’yon.",
+    "You’re learning, growing, and becoming a great nurse.",
+    "Hindi nasusukat sa grades yung worth mo.",
+    "Andito lang ako, always cheering for you.",
+    "Hindi ka nag-iisa sa journey na ’to.",
+    "Your dream is valid, and you’re getting closer.",
+    "Kahit anong mangyari, proud pa rin ako sa’yo.",
+    "You’re doing more than enough.",
+    "Take it easy today ha? Be gentle with yourself.",
+    "Future RN, konting tiis na lang.",
+    "You inspire me more than you know.",
+    "Hindi sayang lahat ng pagod mo.",
+    "You deserve good things, lalo na ngayon.",
+    "I believe in you. Always.",
+    "Alam kong pagod ka today, pero proud ako sa’yo sobra.",
+    "You’re doing great, kahit feeling mo hindi.",
+    "One day at a time lang, okay? You got this.",
+    "Nakikita ko yung effort mo, kahit di mo napapansin.",
+    "Okay lang mapagod. Hindi ibig sabihin mahina ka.",
+    "Future RN ka for a reason.",
+    "Kahit slow days, progress pa rin ’yan.",
+    "Naniniwala ako sa’yo, kahit ikaw minsan nagdududa.",
+    "You don’t have to have it all figured out today.",
+    "Proud ako sa kung paano mo hinahandle lahat.",
+    "Ang tapang mo, kahit tahimik ka lang lumalaban.",
+    "Rest when you need to. Deserve mo ’yon.",
+    "You’re learning, growing, and becoming a great nurse.",
+    "Hindi nasusukat sa grades yung worth mo.",
+    "Andito lang ako, always cheering for you.",
+    "Hindi ka nag-iisa sa journey na ’to.",
+    "Your dream is valid, and you’re getting closer.",
+    "Kahit anong mangyari, proud pa rin ako sa’yo.",
+    "You’re doing more than enough.",
+    "Take it easy today ha? Be gentle with yourself.",
+    "Future RN, konting tiis na lang.",
+    "You inspire me more than you know.",
+    "Hindi sayang lahat ng pagod mo.",
+    "You deserve good things, lalo na ngayon.",
+    "I believe in you. Always.",
 ];
+
+// Message queue to avoid repeats until all messages have been shown
+function shuffleArray(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+let messageQueue = shuffleArray(messages);
 
 const heart = document.getElementById("heart");
 const msg = document.getElementById("message");
@@ -24,8 +110,9 @@ let isCooldown = false;
 
 // random message + sparkles
 heart.addEventListener("click", (e) => {
-    const random = Math.floor(Math.random() * messages.length);
-    const chosen = messages[random];
+    // Pop next message from the shuffled queue; refill when empty
+    if (messageQueue.length === 0) messageQueue = shuffleArray(messages);
+    const chosen = messageQueue.shift();
 
     // If cooldown active, ignore the click
     if (isCooldown) {
@@ -57,14 +144,16 @@ heart.addEventListener("click", (e) => {
         msg.style.opacity = '1';
     }
 
-    // Shorter display time so messages disappear quicker (spam-friendly)
+    // Display time (milliseconds)
+    // Show messages long enough to read
+    const DISPLAY_TIME = 5000; // 5 seconds
     messageTimeout = setTimeout(() => {
         if (msg) {
             msg.classList.remove("show");
             msg.style.opacity = '0';
         }
         messageTimeout = null;
-    }, 800); // 800ms display
+    }, DISPLAY_TIME);
 
     createSparkles(e.pageX, e.pageY);
 });
@@ -88,18 +177,39 @@ function createSparkles(x, y) {
 
 // MUSIC TOGGLE (ICON ONLY)
 let playing = false;
+let autoplayTriggered = false;
+
 // Accessibility attributes
 if (musicBtn) {
     musicBtn.setAttribute('aria-label', 'Toggle background music');
     musicBtn.setAttribute('aria-pressed', 'false');
+    musicBtn.textContent = "🎵"; // Start with play icon
 }
 
-// Log audio load errors
+// Ensure audio is paused on page load
 if (bgMusic) {
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
     bgMusic.addEventListener('error', (e) => {
         console.warn('bgMusic failed to load:', e);
     });
 }
+
+// Autoplay music on first user interaction
+document.addEventListener('click', () => {
+    if (!autoplayTriggered && bgMusic && !playing) {
+        autoplayTriggered = true;
+        bgMusic.play()
+            .then(() => {
+                musicBtn.textContent = "🔇";
+                musicBtn.setAttribute('aria-pressed', 'true');
+                playing = true;
+            })
+            .catch((err) => {
+                console.warn('Autoplay prevented:', err);
+            });
+    }
+}, { once: false });
 
 musicBtn.addEventListener("click", () => {
     if (!bgMusic) {
@@ -107,7 +217,10 @@ musicBtn.addEventListener("click", () => {
         return;
     }
 
-    if (!playing) {
+    // Check actual playback state instead of our variable
+    // (handles cases where user plays via browser controls)
+    if (bgMusic.paused) {
+        // Audio is paused, so play it
         const playPromise = bgMusic.play();
         if (playPromise !== undefined) {
             playPromise.then(() => {
@@ -116,7 +229,6 @@ musicBtn.addEventListener("click", () => {
                 playing = true;
             }).catch((err) => {
                 console.warn('Audio play prevented:', err);
-                // Optionally show a user-visible hint here
             });
         } else {
             // Older browsers may not return a promise
@@ -125,6 +237,7 @@ musicBtn.addEventListener("click", () => {
             playing = true;
         }
     } else {
+        // Audio is playing, so pause it
         bgMusic.pause();
         musicBtn.textContent = "🎵";
         musicBtn.setAttribute('aria-pressed', 'false');
